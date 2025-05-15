@@ -126,6 +126,8 @@ for pos in table_positions:
 trash_bins = pygame.sprite.Group()
 trash_bins.add(TrashBin((50, 100)), TrashBin((750, 100)))
 
+bubble_img = pygame.image.load("dream_bubble.png")
+
 # skupina všech objektů
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
@@ -197,7 +199,6 @@ while running:
     for table in tables:
         if table.customer_waiting:
             # Vykreslení bubliny
-            bubble_img = pygame.image.load("dream_bubble.png")
             bubble_img = pygame.transform.scale(bubble_img, (140, 120))
             bubble_rect = bubble_img.get_rect(center = (table.rect.centerx + 50, table.rect.top))
             screen.blit(bubble_img, bubble_rect)
@@ -219,7 +220,7 @@ while running:
 
     # aktualizace obrazovky
     pygame.display.update()
-    clock.tick(60)  # počet snímků za sekundu
+    clock.tick(90)  # počet snímků za sekundu
 
 # prostě konec
 pygame.quit()
