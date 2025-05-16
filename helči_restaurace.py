@@ -126,6 +126,7 @@ for pos in table_positions:
 trash_bins = pygame.sprite.Group()
 trash_bins.add(TrashBin((50, 100)), TrashBin((750, 100)))
 
+# vytvoření bublin
 bubble_img = pygame.image.load("dream_bubble.png")
 
 # skupina všech objektů
