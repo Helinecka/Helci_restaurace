@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         # vytvoření hráče
         self.image = pygame.image.load("cake.png")
         self.image = pygame.transform.scale(self.image, (40, 110))  # změňte velikost dle potřeby
-        self.rect = self.image.get_rect(center = (325, 180))  # výchozí pozice hráče
+        self.rect = self.image.get_rect(center = (325, 160))  # výchozí pozice hráče
         self.speed = 5  # rychlost pohybu
         self.carrying_food = None  # nese jídlo, nebo nic
 
@@ -71,7 +71,7 @@ class Counter:
     def draw(self, surface):
         # Načteme obrázek pultu
         self.image = pygame.image.load("counter.png")
-        self.image = pygame.transform.scale(self.image, (600, 300))
+        self.image = pygame.transform.scale(self.image, (600, 100))
         self.rect = self.image.get_rect(center = (400, 105))
         surface.blit(self.image, self.rect)
         # Vykreslíme jídla na pultu
@@ -79,7 +79,7 @@ class Counter:
             if self.food_available[i]:
                 # zajistí, že máme správný obrázek pro dané jídlo
                 img = FOOD_IMAGES[i]
-                rect = img.get_rect(center=pos)  # nastaví pozici pro každé jídlo
+                rect = img.get_rect(center = pos)  # nastaví pozici pro každé jídlo
                 surface.blit(img, rect)  # vykreslí jídlo na pult
 
 # třída stolu
@@ -87,7 +87,7 @@ class Table(pygame.sprite.Sprite):
     def __init__(self, pos):
         super().__init__()
         self.image = pygame.image.load("table.png")
-        self.image = pygame.transform.scale(self.image, (250, 190))
+        self.image = pygame.transform.scale(self.image, (240, 180))
         self.rect = self.image.get_rect(center = pos)
         self.customer_waiting = True
         self.served_time = 0
@@ -111,12 +111,12 @@ counter = Counter()
 # vytvoření více stolů
 tables = pygame.sprite.Group()
 table_positions = [
-    (150, 480),
-    (150, 320),
-    (400, 480),
-    (400, 320),
-    (650, 480),
-    (650, 320)]
+    (150, 440),
+    (150, 280),
+    (400, 440),
+    (400, 280),
+    (650, 440),
+    (650, 280)]
 
 for pos in table_positions:
     table = Table(pos)
@@ -200,8 +200,8 @@ while running:
     for table in tables:
         if table.customer_waiting:
             # Vykreslení bubliny
-            bubble_img = pygame.transform.scale(bubble_img, (140, 120))
-            bubble_rect = bubble_img.get_rect(center = (table.rect.centerx + 50, table.rect.top))
+            bubble_img = pygame.transform.scale(bubble_img, (120, 100))
+            bubble_rect = bubble_img.get_rect(center = (table.rect.centerx + 50, table.rect.top + 10))
             screen.blit(bubble_img, bubble_rect)
 
             # Vykreslení jídla uvnitř bubliny
