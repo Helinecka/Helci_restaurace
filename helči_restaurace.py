@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load("cake.png")
         self.image = pygame.transform.scale(self.image, (40, 110))  # změňte velikost dle potřeby
         self.rect = self.image.get_rect(center = (325, 160))  # výchozí pozice hráče
-        self.speed = 5  # rychlost pohybu
+        self.speed = 3  # rychlost pohybu
         self.carrying_food = None  # nese jídlo, nebo nic
 
     # ovládání hráče šipkami
