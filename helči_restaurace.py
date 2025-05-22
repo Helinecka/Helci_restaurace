@@ -131,9 +131,9 @@ bubble_img = pygame.image.load("dream_bubble.png")
 
 # skupina všech objektů
 all_sprites = pygame.sprite.Group()
-all_sprites.add(player)
-all_sprites.add(tables)
 all_sprites.add(trash_bins)
+all_sprites.add(tables)
+all_sprites.add(player)
 
 # proměnné
 score = 0
