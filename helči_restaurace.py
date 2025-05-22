@@ -38,8 +38,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         # vytvoření hráče
-        self.image = pygame.image.load("cake.png")
-        self.image = pygame.transform.scale(self.image, (40, 110))  # změňte velikost dle potřeby
+        self.image = pygame.image.load("player.png")
+        self.image = pygame.transform.scale(self.image, (100, 170))
         self.rect = self.image.get_rect(center = (325, 160))  # výchozí pozice hráče
         self.speed = 3  # rychlost pohybu
         self.carrying_food = None  # nese jídlo, nebo nic
@@ -174,10 +174,14 @@ while running:
     for table in tables:
         if player.rect.colliderect(table.rect) and player.carrying_food is not None and table.customer_waiting:
             if player.carrying_food == table.requested_food:
-                score += 1
-                table.customer_waiting = False
-                table.served_time = current_time
-                player.carrying_food = None  # obslouženo když nese správné jídlo
+                # Kontrola, zda hráč stiskl klávesu ENTER
+                if keys[pygame.K_SPACE]:  # pokud je stisknutý Enter
+                    score += 1
+                    table.customer_waiting = False
+                    table.served_time = current_time
+                    player.carrying_food = None  # obslouženo, když nese správné jídlo
+
+
 
     # Po 3 sekundách se zákazník znovu objeví a jídlo se obnoví na pultu
     for table in tables:
@@ -227,6 +231,6 @@ while running:
 pygame.quit()
 
 # TO DO LIST: 
-# dodělat zákazníky (i to jak prichazeji)
+# dodělat zákazníky
 # zbarvování zákazníka do červena podle délky čekání - rudý zákazník odchází a snižuje skore
 # nelze chodit skrz stoly a jiné objekty
