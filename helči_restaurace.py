@@ -229,3 +229,8 @@ while running:
 
 # prostě konec
 pygame.quit()
+
+# TO DO LIST: 
+# dodělat zákazníky
+# zbarvování zákazníka do červena podle délky čekání - rudý zákazník odchází a snižuje skore
+# nelze chodit skrz stoly a jiné objekty
