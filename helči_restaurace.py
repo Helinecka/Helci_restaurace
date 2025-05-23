@@ -84,10 +84,10 @@ class Player(pygame.sprite.Sprite):
             self.animation_timer += clock.get_time()
             if self.animation_timer > 150:
                 self.animation_timer = 0
-                self.animation_index = (self.animation_index + 1) % 3 # 3 snímky (0,1,2)
+                self.animation_index = 1 if self.animation_index == 2 else 2
         else:
-            self.animation_index = 0 # hrac stojí
-
+            self.animation_index = 0  # stojí
+            
         # nastavení správného obrázku podle směru a animace
         if self.direction == "right":
             self.image = self.images_right[self.animation_index]
