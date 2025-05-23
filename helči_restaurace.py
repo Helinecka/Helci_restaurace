@@ -39,13 +39,13 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         # obrazky pro animaci
         self.images_right = [
-            pygame.transform.scale(pygame.image.load("cake.png"), (100, 170)),
-            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 170)),
-            pygame.transform.scale(pygame.image.load("meat.png"), (100, 170))]
+            pygame.transform.scale(pygame.image.load("player_standing_right.png"), (100, 170)), # stoji a kouka do prava
+            pygame.transform.scale(pygame.image.load("player_walking_right1.png"), (100, 170)), # jde do prava 1
+            pygame.transform.scale(pygame.image.load("player_walking_right2.png"), (100, 170))] # jde do prava 2
         self.images_left = [
-            pygame.transform.scale(pygame.image.load("cake.png"), (100, 170)),
-            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 170)),
-            pygame.transform.scale(pygame.image.load("meat.png"), (100, 170))]
+            pygame.transform.scale(pygame.image.load("player_standing_left.png"), (100, 170)), # stoji a kouka do leva
+            pygame.transform.scale(pygame.image.load("player_walking_left1.png"), (100, 170)),# jde do leva 1
+            pygame.transform.scale(pygame.image.load("player_walking_left2.png"), (100, 170))] # jde do leva 2
 
         self.image = self.images_right[0]  # výchozí obrázek - stojící doprava
         self.rect = self.image.get_rect(center = (280, 160))
@@ -65,7 +65,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = max(0, self.rect.x - self.speed)
             self.direction = "left"
             self.walking = True
-            
+
         elif keys[pygame.K_RIGHT]:
             self.rect.x = min(window_width - self.rect.width, self.rect.x + self.speed)
             self.direction = "right"
