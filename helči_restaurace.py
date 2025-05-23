@@ -37,23 +37,58 @@ font = pygame.font.SysFont(None, 36)
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        # vytvoření hráče
-        self.image = pygame.image.load("player.png")
-        self.image = pygame.transform.scale(self.image, (100, 170))
-        self.rect = self.image.get_rect(center = (280, 160))  # výchozí pozice hráče
-        self.speed = 3  # rychlost pohybu
-        self.carrying_food = None  # nese jídlo, nebo nic
+        # obrazky pro animaci
+        self.images_right = [
+            pygame.transform.scale(pygame.image.load("cake.png"), (100, 170)),
+            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 170)),
+            pygame.transform.scale(pygame.image.load("meat.png"), (100, 170))]
+        self.images_left = [
+            pygame.transform.scale(pygame.image.load("cake.png"), (100, 170)),
+            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 170)),
+            pygame.transform.scale(pygame.image.load("meat.png"), (100, 170))]
 
-    # ovládání hráče šipkami
+        self.image = self.images_right[0]  # výchozí obrázek - stojící doprava
+        self.rect = self.image.get_rect(center = (280, 160))
+        self.speed = 3
+        self.carrying_food = None
+
+        self.direction = "right" # aktuální směr pohybu
+        self.walking = False # jestli hráč právě chodí
+        self.animation_index = 0 # index pro animaci nohou
+        self.animation_timer = 0 # časovač animace (pro přepínání snímků)
+
     def update(self, keys):
+        self.walking = False
+        old_x = self.rect.x
+
         if keys[pygame.K_LEFT]:
             self.rect.x = max(0, self.rect.x - self.speed)
-        if keys[pygame.K_RIGHT]:
+            self.direction = "left"
+            self.walking = True
+        elif keys[pygame.K_RIGHT]:
             self.rect.x = min(window_width - self.rect.width, self.rect.x + self.speed)
+            self.direction = "right"
+            self.walking = True
+
         if keys[pygame.K_UP]:
             self.rect.y = max(0, self.rect.y - self.speed)
         if keys[pygame.K_DOWN]:
             self.rect.y = min(window_height - self.rect.height, self.rect.y + self.speed)
+
+        # animace nohou
+        if self.walking:
+            self.animation_timer += clock.get_time()
+            if self.animation_timer > 150:
+                self.animation_timer = 0
+                self.animation_index = (self.animation_index + 1) % 3 # 3 snímky (0,1,2)
+        else:
+            self.animation_index = 0 # hrac stojí
+
+        # nastavení správného obrázku podle směru a animace
+        if self.direction == "right":
+            self.image = self.images_right[self.animation_index]
+        else:
+            self.image = self.images_left[self.animation_index]
 
     def get_feet_rect(self):
         # obdélník představující nohy hráče
