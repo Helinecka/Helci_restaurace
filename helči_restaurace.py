@@ -65,6 +65,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = max(0, self.rect.x - self.speed)
             self.direction = "left"
             self.walking = True
+            
         elif keys[pygame.K_RIGHT]:
             self.rect.x = min(window_width - self.rect.width, self.rect.x + self.speed)
             self.direction = "right"
@@ -72,8 +73,11 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_UP]:
             self.rect.y = max(0, self.rect.y - self.speed)
+            self.walking = True
+
         if keys[pygame.K_DOWN]:
             self.rect.y = min(window_height - self.rect.height, self.rect.y + self.speed)
+            self.walking = True
 
         # animace nohou
         if self.walking:
