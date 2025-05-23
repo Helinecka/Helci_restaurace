@@ -163,7 +163,7 @@ while running:
 
     # PODMÍNKY
     # POKUD je hráč u jídla na pultu a nic nenese TAK vezme jídlo
-    if player.carrying_food is None:
+    if player.carrying_food is None and keys[pygame.K_SPACE]:
         for i, pos in enumerate(counter.positions):
             rect = pygame.Rect(pos[0] - 15, pos[1] - 15, 30, 30)
             if rect.colliderect(player.rect) and counter.food_available[i]:
