@@ -40,20 +40,27 @@ class Player(pygame.sprite.Sprite):
         # vytvoření hráče
         self.image = pygame.image.load("player.png")
         self.image = pygame.transform.scale(self.image, (100, 170))
-        self.rect = self.image.get_rect(center = (325, 160))  # výchozí pozice hráče
+        self.rect = self.image.get_rect(center = (280, 160))  # výchozí pozice hráče
         self.speed = 3  # rychlost pohybu
         self.carrying_food = None  # nese jídlo, nebo nic
 
     # ovládání hráče šipkami
     def update(self, keys):
         if keys[pygame.K_LEFT]:
-            self.rect.x -= self.speed
+            self.rect.x = max(0, self.rect.x - self.speed)
         if keys[pygame.K_RIGHT]:
-            self.rect.x += self.speed
+            self.rect.x = min(window_width - self.rect.width, self.rect.x + self.speed)
         if keys[pygame.K_UP]:
-            self.rect.y -= self.speed
+            self.rect.y = max(0, self.rect.y - self.speed)
         if keys[pygame.K_DOWN]:
-            self.rect.y += self.speed
+            self.rect.y = min(window_height - self.rect.height, self.rect.y + self.speed)
+
+    def get_feet_rect(self):
+        # obdélník představující nohy hráče
+        return pygame.Rect(
+            self.rect.left + 20,
+            self.rect.bottom - 10,
+            self.rect.width - 40, 10)
 
 # třída pultu s jídly
 class Counter:
@@ -140,11 +147,6 @@ score = 0
 clock = pygame.time.Clock()
 running = True
 
-# kolize
-collision_objects = pygame.sprite.Group()
-collision_objects.add(tables)
-collision_objects.add(trash_bins)
-
 # HERNÍ SMYČKA
 while running:
     current_time = pygame.time.get_ticks()
@@ -170,7 +172,7 @@ while running:
                 counter.last_spawn[i] = current_time
                 break
 
-    # POKUD je hráč u nějakého stolu, nese jídlo a zákazník čeká TAK ho obslouží
+    # POKUD je hráč u nějakého stolu, nese jídlo, zákazník čeká a stiskne SPACE TAK ho obslouží
     for table in tables:
         if player.rect.colliderect(table.rect) and player.carrying_food is not None and table.customer_waiting:
             if player.carrying_food == table.requested_food:
@@ -181,18 +183,16 @@ while running:
                     table.served_time = current_time
                     player.carrying_food = None  # obslouženo, když nese správné jídlo
 
-
-
     # Po 3 sekundách se zákazník znovu objeví a jídlo se obnoví na pultu
     for table in tables:
         if not table.customer_waiting:
             if current_time - table.served_time > 3000:
                 table.reset_customer()
 
-    # POKUD je hráč u koše TAK zahodí jídlo
+    # POKUD je hráč u koše a stiskne SPACE TAK zahodí jídlo
     if player.carrying_food is not None:
         for bin in trash_bins:
-            if player.rect.colliderect(bin.rect):
+            if player.rect.colliderect(bin.rect) and keys[pygame.K_SPACE]:
                 player.carrying_food = None
 
     # VYKRESLOVÁNÍ
