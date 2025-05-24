@@ -265,7 +265,6 @@ while running:
 
             if table.customer.angry:
                 table.customer_waiting = False
-                player.carrying_food = None
                 score = max(0, score - 1)  # ubere skore, ale nedovolí jít do záporu
 
             # obsluha zákazníka
