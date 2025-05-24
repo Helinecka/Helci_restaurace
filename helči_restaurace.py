@@ -99,9 +99,9 @@ class Player(pygame.sprite.Sprite):
 
         if self.direction == "right":
             self.image = self.images_right[self.animation_index]
+
         else:
             self.image = self.images_left[self.animation_index]
-
 
     def get_feet_rect(self):
         # obdélník představující nohy hráče
@@ -148,9 +148,14 @@ class Table(pygame.sprite.Sprite):
         self.served_time = 0
         self.requested_food = random.randint(0, 4)
 
+        self.customer = Customer()
+        self.customer.rect.midbottom = self.rect.midtop
+
     def reset_customer(self):
         self.customer_waiting = True
         self.requested_food = random.randint(0, 4)
+        self.customer = Customer()
+        self.customer.rect.midbottom = (self.rect.centerx, self.rect.top + 180)
 
 # třída koše
 class TrashBin(pygame.sprite.Sprite):
@@ -159,6 +164,37 @@ class TrashBin(pygame.sprite.Sprite):
         self.image = pygame.image.load("trash_bin.png")
         self.image = pygame.transform.scale(self.image, (70, 90))
         self.rect = self.image.get_rect(center = pos)
+
+# třída zákazníka
+class Customer(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.images = [
+            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("cake.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("meat.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("coca_cola.png"), (100, 120))]
+        
+        self.image = self.images[0]
+        self.rect = self.image.get_rect()
+        self.stage = 0  # 0–2 = čekání, 3 = mizí
+        self.spawn_time = pygame.time.get_ticks()
+        self.angry = False
+
+    def update(self, current_time, table_rect):
+        elapsed = current_time - self.spawn_time
+        if elapsed > 80000:
+            self.stage = 3
+            self.angry = True
+        elif elapsed > 40000:
+            self.stage = 2
+        elif elapsed > 20000:
+            self.stage = 1
+        else:
+            self.stage = 0
+
+        self.image = self.images[self.stage]
+        self.rect.midbottom = (table_rect.centerx, table_rect.top + 180)
 
 player = Player()
 counter = Counter()
@@ -222,14 +258,20 @@ while running:
 
     # POKUD je hráč u nějakého stolu, nese jídlo, zákazník čeká a stiskne SPACE TAK ho obslouží
     for table in tables:
-        if player.rect.colliderect(table.rect) and player.carrying_food is not None and table.customer_waiting:
-            if player.carrying_food == table.requested_food:
-                # Kontrola, zda hráč stiskl klávesu ENTER
-                if keys[pygame.K_SPACE]:  # pokud je stisknutý Enter
-                    score += 1
-                    table.customer_waiting = False
-                    table.served_time = current_time
-                    player.carrying_food = None  # obslouženo, když nese správné jídlo
+        if table.customer_waiting:
+            table.customer.update(current_time, table.rect)
+
+            if table.customer.angry:
+                table.customer_waiting = False
+                player.carrying_food = None
+                score = max(0, score - 1)  # ubere skore, ale nedovolí jít pod 0
+
+            # obsluha zákazníka
+            elif player.carrying_food == table.requested_food and player.rect.colliderect(table.rect) and keys[pygame.K_SPACE]:
+                score += 1  # přičti bod
+                player.carrying_food = None
+                table.customer_waiting = False
+                table.served_time = current_time
 
     # Po 3 sekundách se zákazník znovu objeví a jídlo se obnoví na pultu
     for table in tables:
@@ -247,6 +289,10 @@ while running:
     screen.blit(background_image, (0, 0)) # pozadí
     counter.draw(screen) # pult a jídla
     all_sprites.draw(screen) # všechny objekty
+    # zákaznik
+    for table in tables:
+        if table.customer_waiting:
+            screen.blit(table.customer.image, table.customer.rect)
 
     # obrázek nad stolem když je objednávka
     for table in tables:
