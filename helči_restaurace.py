@@ -170,25 +170,27 @@ class Customer(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.images = [
-            pygame.transform.scale(pygame.image.load("sushi.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("cake.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("meat.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("coca_cola.png"), (100, 120))]
+            pygame.transform.scale(pygame.image.load("customer1.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("customer2.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("customer3.png"), (100, 120)),
+            pygame.transform.scale(pygame.image.load("customer_angry.png"), (100, 120))]
         
         self.image = self.images[0]
         self.rect = self.image.get_rect()
-        self.stage = 0  # 0–2 = čekání, 3 = mizí
+        self.stage = 0
         self.spawn_time = pygame.time.get_ticks()
         self.angry = False
 
     def update(self, current_time, table_rect):
         elapsed = current_time - self.spawn_time
-        if elapsed > 80000:
+        if elapsed > 40000:
             self.stage = 3
             self.angry = True
-        elif elapsed > 40000:
-            self.stage = 2
+        elif elapsed > 30000:
+            self.stage = 3
         elif elapsed > 20000:
+            self.stage = 2
+        elif elapsed > 10000:
             self.stage = 1
         else:
             self.stage = 0
@@ -264,11 +266,11 @@ while running:
             if table.customer.angry:
                 table.customer_waiting = False
                 player.carrying_food = None
-                score = max(0, score - 1)  # ubere skore, ale nedovolí jít pod 0
+                score = max(0, score - 1)  # ubere skore, ale nedovolí jít do záporu
 
             # obsluha zákazníka
             elif player.carrying_food == table.requested_food and player.rect.colliderect(table.rect) and keys[pygame.K_SPACE]:
-                score += 1  # přičti bod
+                score += 1
                 player.carrying_food = None
                 table.customer_waiting = False
                 table.served_time = current_time
@@ -325,6 +327,6 @@ while running:
 pygame.quit()
 
 # TO DO LIST: 
-# dodělat zákazníky
-# zbarvování zákazníka do červena podle délky čekání - rudý zákazník odchází a snižuje skore
-# nelze chodit skrz stoly a jiné objekty
+# nelze chodit skrz stoly a jiné objekty - uz fakt nevim jak
+# vyresit prevzati a predani jidla najednou
+# vyresit vrstvy obrazku
