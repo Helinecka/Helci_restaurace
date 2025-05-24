@@ -170,10 +170,10 @@ class Customer(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.images = [
-            pygame.transform.scale(pygame.image.load("customer1.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("customer2.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("customer3.png"), (100, 120)),
-            pygame.transform.scale(pygame.image.load("customer_angry.png"), (100, 120))]
+            pygame.transform.scale(pygame.image.load("customer1.png"), (70, 120)),
+            pygame.transform.scale(pygame.image.load("customer2.png"), (70, 120)),
+            pygame.transform.scale(pygame.image.load("customer3.png"), (70, 120)),
+            pygame.transform.scale(pygame.image.load("customer_angry.png"), (70, 120))]
         
         self.image = self.images[0]
         self.rect = self.image.get_rect()
