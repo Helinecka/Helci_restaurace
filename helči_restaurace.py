@@ -32,6 +32,11 @@ background_image = pygame.transform.scale(background_image, (window_width, windo
 # font
 font = pygame.font.SysFont(None, 36)
 
+# kytky
+flowers = [
+    pygame.Rect(0, window_height - 130, 50, 150),  # leva kytka
+    pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
+
 # TŘÍDY
 # třída číšníka = hráče
 class Player(pygame.sprite.Sprite):
@@ -59,25 +64,29 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, keys):
         self.walking = False
-        old_x = self.rect.x
+        new_rect = self.rect.copy()
 
         if keys[pygame.K_LEFT]:
-            self.rect.x = max(0, self.rect.x - self.speed)
+            new_rect.x = max(0, new_rect.x - self.speed)
             self.direction = "left"
             self.walking = True
 
         elif keys[pygame.K_RIGHT]:
-            self.rect.x = min(window_width - self.rect.width, self.rect.x + self.speed)
+            new_rect.x = min(window_width - new_rect.width, new_rect.x + self.speed)
             self.direction = "right"
             self.walking = True
 
         if keys[pygame.K_UP]:
-            self.rect.y = max(0, self.rect.y - self.speed)
+            new_rect.y = max(0, new_rect.y - self.speed)
             self.walking = True
 
         if keys[pygame.K_DOWN]:
-            self.rect.y = min(window_height - self.rect.height, self.rect.y + self.speed)
+            new_rect.y = min(window_height - new_rect.height, new_rect.y + self.speed)
             self.walking = True
+
+        # kolize s kytkama
+        if not any(zone.colliderect(new_rect) for zone in flowers):
+            self.rect = new_rect  # pohyb jen pokud není kolize
 
         # animace nohou
         if self.walking:
@@ -86,13 +95,13 @@ class Player(pygame.sprite.Sprite):
                 self.animation_timer = 0
                 self.animation_index = 1 if self.animation_index == 2 else 2
         else:
-            self.animation_index = 0  # stojí
-            
-        # nastavení správného obrázku podle směru a animace
+            self.animation_index = 0
+
         if self.direction == "right":
             self.image = self.images_right[self.animation_index]
         else:
             self.image = self.images_left[self.animation_index]
+
 
     def get_feet_rect(self):
         # obdélník představující nohy hráče
