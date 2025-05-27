@@ -37,6 +37,37 @@ flowers = [
     pygame.Rect(0, window_height - 130, 50, 150),  # leva kytka
     pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
 
+# instrukce ke hře
+def show_instructions():
+    showing = True
+    while showing:
+        screen.blit(background_image, (0, 0))
+
+        title = font.render("Helči restaurace", True, BLACK)
+        instruction1 = font.render("Pohyb: šipkami", True, BLACK)
+        instruction2 = font.render("Interakce: mezerníkem", True, BLACK)
+        instruction3 = font.render("Obsluž zákazníky dřív, než se naštvou!", True, BLACK)
+        instruction4 = font.render("Zahoď jídlo u koše, pokud neseš nesprávné.", True, BLACK)
+        start_text = font.render("Stiskni ENTER pro spuštění hry.", True, RED)
+
+        screen.blit(title, (window_width//2 - title.get_width()//2, 100))
+        screen.blit(instruction1, (window_width//2 - instruction1.get_width()//2, 180))
+        screen.blit(instruction2, (window_width//2 - instruction2.get_width()//2, 220))
+        screen.blit(instruction3, (window_width//2 - instruction3.get_width()//2, 260))
+        screen.blit(instruction4, (window_width//2 - instruction4.get_width()//2, 300))
+        screen.blit(start_text, (window_width//2 - start_text.get_width()//2, 380))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:  # ENTER
+                    showing = False
+
 # TŘÍDY
 # třída číšníka = hráče
 class Player(pygame.sprite.Sprite):
@@ -54,7 +85,7 @@ class Player(pygame.sprite.Sprite):
 
         self.image = self.images_right[0]  # výchozí obrázek - stojící doprava
         self.rect = self.image.get_rect(center = (280, 160))
-        self.speed = 3
+        self.speed = 5
         self.carrying_food = None
 
         self.direction = "right" # aktuální směr pohybu
@@ -233,6 +264,9 @@ score = 0
 clock = pygame.time.Clock()
 running = True
 
+# zavolani funkce instrukci
+show_instructions()
+
 # HERNÍ SMYČKA
 while running:
     current_time = pygame.time.get_ticks()
@@ -265,14 +299,15 @@ while running:
 
             if table.customer.angry:
                 table.customer_waiting = False
-                score = max(0, score - 1)  # ubere skore, ale nedovolí jít do záporu
+                table.served_time = current_time
+                score = max(0, score - 1)
 
-            # obsluha zákazníka
             elif player.carrying_food == table.requested_food and player.rect.colliderect(table.rect) and keys[pygame.K_SPACE]:
                 score += 1
                 player.carrying_food = None
                 table.customer_waiting = False
                 table.served_time = current_time
+
 
     # Po 3 sekundách se zákazník znovu objeví a jídlo se obnoví na pultu
     for table in tables:
