@@ -33,9 +33,9 @@ background_image = pygame.transform.scale(background_image, (window_width, windo
 font = pygame.font.SysFont(None, 36)
 
 # kytky
-flowers = [
-    pygame.Rect(0, window_height - 130, 50, 150),  # leva kytka
-    pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
+#flowers = [
+    #pygame.Rect(0, window_height - 130, 50, 150),  # leva kytka
+    #pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
 
 # instrukce ke hře
 def show_instructions():
@@ -50,7 +50,7 @@ def show_instructions():
         instruction4 = font.render("Zahoď jídlo u koše, pokud neseš nesprávné.", True, BLACK)
         start_text = font.render("Stiskni ENTER pro spuštění hry.", True, RED)
 
-        screen.blit(title, (window_width//2 - title.get_width()//2, 100))
+        screen.blit(title, (window_width//2 - title.get_width()//2, 110))
         screen.blit(instruction1, (window_width//2 - instruction1.get_width()//2, 180))
         screen.blit(instruction2, (window_width//2 - instruction2.get_width()//2, 220))
         screen.blit(instruction3, (window_width//2 - instruction3.get_width()//2, 260))
@@ -65,7 +65,7 @@ def show_instructions():
                 exit()
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:  # ENTER
+                if event.key == pygame.K_RETURN:
                     showing = False
 
 # TŘÍDY
@@ -84,14 +84,14 @@ class Player(pygame.sprite.Sprite):
             pygame.transform.scale(pygame.image.load("player_walking_left2.png"), (50, 150))] # jde do leva 2
 
         self.image = self.images_right[0]  # výchozí obrázek - stojící doprava
-        self.rect = self.image.get_rect(center = (280, 160))
+        self.rect = self.image.get_rect(center = (280, 150)) # výchozí pozice hráče
         self.speed = 5
         self.carrying_food = None
 
         self.direction = "right" # aktuální směr pohybu
         self.walking = False # jestli hráč právě chodí
         self.animation_index = 0 # index pro animaci nohou
-        self.animation_timer = 0 # časovač animace (pro přepínání snímků)
+        self.animation_timer = 0 # časovač animace
 
     def update(self, keys):
         self.walking = False
@@ -115,10 +115,13 @@ class Player(pygame.sprite.Sprite):
             new_rect.y = min(window_height - new_rect.height, new_rect.y + self.speed)
             self.walking = True
 
-        # kolize s kytkama
-        if not any(zone.colliderect(new_rect) for zone in flowers):
-            self.rect = new_rect  # pohyb jen pokud není kolize
+        self.rect = new_rect  # pohyb bez kontroly kolizí ------ PO VYRESENI KOLIZI SMAZAT
 
+        # kolize s překážkami           ------- NEFUNGUJE
+        #feet_rect = self.get_feet_rect()
+        #if not any(obstacle.colliderect(feet_rect) for obstacle in obstacle_rects):
+            #self.rect = new_rect
+            
         # animace nohou
         if self.walking:
             self.animation_timer += clock.get_time()
@@ -264,6 +267,21 @@ score = 0
 clock = pygame.time.Clock()
 running = True
 
+#      PŘEKÁŽKY             ------- NEFUNGUJE
+#obstacle_rects = []
+#      přidání stolů
+#for table in tables:
+    #obstacle_rects.append(table.rect)
+#      přidání pultu
+#counter_rect = pygame.Rect(100, 55, 600, 100)  # vyhrazeni pultu
+#obstacle_rects.append(counter_rect)
+#      přidání košů
+#for bin in trash_bins:
+    #obstacle_rects.append(bin.rect)
+#      přidání květin
+#for flower in flowers:
+    #obstacle_rects.append(flower)
+
 # zavolani funkce instrukci
 show_instructions()
 
@@ -308,7 +326,6 @@ while running:
                 table.customer_waiting = False
                 table.served_time = current_time
 
-
     # Po 3 sekundách se zákazník znovu objeví a jídlo se obnoví na pultu
     for table in tables:
         if not table.customer_waiting:
@@ -324,11 +341,26 @@ while running:
     # VYKRESLOVÁNÍ
     screen.blit(background_image, (0, 0)) # pozadí
     counter.draw(screen) # pult a jídla
-    all_sprites.draw(screen) # všechny objekty
+    
     # zákaznik
     for table in tables:
         if table.customer_waiting:
             screen.blit(table.customer.image, table.customer.rect)
+
+    # vyreseni vrstev obrazku podle osy Y
+    sprites_to_draw = []
+
+    for table in tables:
+        sprites_to_draw.append(table)
+        if table.customer_waiting:
+            sprites_to_draw.append(table.customer)
+
+    sprites_to_draw += [player] + list(trash_bins)
+
+    sprites_to_draw.sort(key = lambda sprite: sprite.rect.bottom) # seradi objekty podle spodni hrany
+
+    for sprite in sprites_to_draw:
+        screen.blit(sprite.image, sprite.rect)
 
     # obrázek nad stolem když je objednávka
     for table in tables:
