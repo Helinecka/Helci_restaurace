@@ -285,23 +285,36 @@ running = True
 # zavolani funkce instrukci
 show_instructions()
 
+# proměnné pro klávesy
+space_pressed = False
+space_was_pressed_last_frame = False
+
 # HERNÍ SMYČKA
 while running:
     current_time = pygame.time.get_ticks()
-    keys = pygame.key.get_pressed()
 
-    # zavření okna
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # pohyb
+    keys = pygame.key.get_pressed()
+
+    # Jednorázový stisk mezerníku
+    if keys[pygame.K_SPACE] and not space_was_pressed_last_frame:
+        space_pressed = True
+    else:
+        space_pressed = False
+
+    # Ulož stav pro další snímek
+    space_was_pressed_last_frame = keys[pygame.K_SPACE]
+
+    # pohyb hráče
     player.update(keys)
     counter.update(current_time)
 
     # PODMÍNKY
     # POKUD je hráč u jídla na pultu a nic nenese TAK vezme jídlo
-    if player.carrying_food is None and keys[pygame.K_SPACE]:
+    if player.carrying_food is None and space_pressed:
         for i, pos in enumerate(counter.positions):
             rect = pygame.Rect(pos[0] - 15, pos[1] - 15, 30, 30)
             if rect.colliderect(player.rect) and counter.food_available[i]:
@@ -320,7 +333,7 @@ while running:
                 table.served_time = current_time
                 score = max(0, score - 1)
 
-            elif player.carrying_food == table.requested_food and player.rect.colliderect(table.rect) and keys[pygame.K_SPACE]:
+            elif player.carrying_food == table.requested_food and player.rect.colliderect(table.rect) and space_pressed:
                 score += 1
                 player.carrying_food = None
                 table.customer_waiting = False
@@ -335,13 +348,13 @@ while running:
     # POKUD je hráč u koše a stiskne SPACE TAK zahodí jídlo
     if player.carrying_food is not None:
         for bin in trash_bins:
-            if player.rect.colliderect(bin.rect) and keys[pygame.K_SPACE]:
+            if player.rect.colliderect(bin.rect) and space_pressed:
                 player.carrying_food = None
 
     # VYKRESLOVÁNÍ
     screen.blit(background_image, (0, 0)) # pozadí
     counter.draw(screen) # pult a jídla
-    
+
     # zákaznik
     for table in tables:
         if table.customer_waiting:
@@ -365,12 +378,12 @@ while running:
     # obrázek nad stolem když je objednávka
     for table in tables:
         if table.customer_waiting:
-            # Vykreslení bubliny
+            # vykreslení bubliny
             bubble_img = pygame.transform.scale(bubble_img, (120, 100))
             bubble_rect = bubble_img.get_rect(center = (table.rect.centerx + 50, table.rect.top + 10))
             screen.blit(bubble_img, bubble_rect)
 
-            # Vykreslení jídla uvnitř bubliny
+            # vykreslení jídla uvnitř bubliny
             img = FOOD_IMAGES[table.requested_food]
             rect = img.get_rect(center = (table.rect.centerx + 50, table.rect.top))
             screen.blit(img, rect)
@@ -395,4 +408,3 @@ pygame.quit()
 # TO DO LIST: 
 # nelze chodit skrz stoly a jiné objekty - uz fakt nevim jak
 # vyresit prevzati a predani jidla najednou
-# vyresit vrstvy obrazku
