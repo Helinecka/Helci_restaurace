@@ -38,10 +38,14 @@ font = pygame.font.SysFont(None, 36)
     #pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
 
 # instrukce ke hře
+information_background = pygame.image.load("information_background.png")
+information_background = pygame.transform.scale(information_background, (700, 700))
+
 def show_instructions():
     showing = True
     while showing:
         screen.blit(background_image, (0, 0))
+        screen.blit(information_background, (50, -80))
 
         title = font.render("Helči restaurace", True, BLACK)
         instruction1 = font.render("Pohyb: šipkami", True, BLACK)
@@ -50,7 +54,7 @@ def show_instructions():
         instruction4 = font.render("Zahoď jídlo u koše, pokud neseš nesprávné.", True, BLACK)
         start_text = font.render("Stiskni ENTER pro spuštění hry.", True, RED)
 
-        screen.blit(title, (window_width//2 - title.get_width()//2, 110))
+        screen.blit(title, (window_width//2 - title.get_width()//2, 130))
         screen.blit(instruction1, (window_width//2 - instruction1.get_width()//2, 180))
         screen.blit(instruction2, (window_width//2 - instruction2.get_width()//2, 220))
         screen.blit(instruction3, (window_width//2 - instruction3.get_width()//2, 260))
@@ -315,6 +319,7 @@ while running:
     # PODMÍNKY
     # POKUD je hráč u jídla na pultu a nic nenese TAK vezme jídlo
     if player.carrying_food is None and space_pressed:
+        space_pressed = False
         for i, pos in enumerate(counter.positions):
             rect = pygame.Rect(pos[0] - 15, pos[1] - 15, 30, 30)
             if rect.colliderect(player.rect) and counter.food_available[i]:
