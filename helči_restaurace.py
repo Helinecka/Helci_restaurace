@@ -13,7 +13,7 @@ pygame.display.set_caption("Helči restaurace")  # název okna
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (100, 200, 100)
-RED = (255, 100, 100)
+RED = (255, 0, 0)
 BLUE = (100, 100, 255)
 GREY = (200, 200, 200)
 
@@ -227,14 +227,14 @@ class Customer(pygame.sprite.Sprite):
 
     def update(self, current_time, table_rect):
         elapsed = current_time - self.spawn_time
-        if elapsed > 40000:
+        if elapsed > 32000:
             self.stage = 3
             self.angry = True
-        elif elapsed > 30000:
+        elif elapsed > 24000:
             self.stage = 3
-        elif elapsed > 20000:
+        elif elapsed > 16000:
             self.stage = 2
-        elif elapsed > 10000:
+        elif elapsed > 8000:
             self.stage = 1
         else:
             self.stage = 0
@@ -418,4 +418,3 @@ pygame.quit()
 
 # TO DO LIST: 
 # nelze chodit skrz stoly a jiné objekty - uz fakt nevim jak
-# vyresit prevzati a predani jidla najednou
