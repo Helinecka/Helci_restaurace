@@ -2,6 +2,14 @@ import pygame
 import random
 
 pygame.init()
+pygame.mixer.init()
+
+# hudba
+zvuk = pygame.mixer.Sound("background_soundtrack.mp3")
+zvuk.set_volume(0.3)
+pygame.mixer.Sound.play(-1)  # opakuje se dokola
+
+akce_zvuk = pygame.mixer.Sound("action.mp3")
 
 # vytvoření herního okna
 window_width = 800
@@ -31,11 +39,6 @@ background_image = pygame.transform.scale(background_image, (window_width, windo
 
 # font
 font = pygame.font.SysFont(None, 36)
-
-# kytky
-#flowers = [
-    #pygame.Rect(0, window_height - 130, 50, 150),  # leva kytka
-    #pygame.Rect(window_width - 50, window_height - 130, 50, 150)]  # prava kytka
 
 # instrukce ke hře
 information_background = pygame.image.load("information_background.png")
@@ -126,11 +129,6 @@ class Player(pygame.sprite.Sprite):
             self.walking = True
 
         self.rect = new_rect  # pohyb bez kontroly kolizí ------ PO VYRESENI KOLIZI SMAZAT
-
-        # kolize s překážkami           ------- NEFUNGUJE
-        #feet_rect = self.get_feet_rect()
-        #if not any(obstacle.colliderect(feet_rect) for obstacle in obstacle_rects):
-            #self.rect = new_rect
             
         # animace nohou
         if self.walking:
@@ -242,6 +240,9 @@ class Customer(pygame.sprite.Sprite):
         self.image = self.images[self.stage]
         self.rect.midbottom = (table_rect.centerx, table_rect.top + 180)
 
+    def reset_spawn_time(self):
+        self.spawn_time = pygame.time.get_ticks()
+
 player = Player()
 counter = Counter()
 
@@ -277,23 +278,11 @@ score = 0
 clock = pygame.time.Clock()
 running = True
 
-#      PŘEKÁŽKY             ------- NEFUNGUJE
-#obstacle_rects = []
-#      přidání stolů
-#for table in tables:
-    #obstacle_rects.append(table.rect)
-#      přidání pultu
-#counter_rect = pygame.Rect(100, 55, 600, 100)  # vyhrazeni pultu
-#obstacle_rects.append(counter_rect)
-#      přidání košů
-#for bin in trash_bins:
-    #obstacle_rects.append(bin.rect)
-#      přidání květin
-#for flower in flowers:
-    #obstacle_rects.append(flower)
-
 # zavolani funkce instrukci
 show_instructions()
+
+for table in tables:
+    table.customer.reset_spawn_time()
 
 # proměnné pro klávesy
 space_pressed = False
@@ -306,7 +295,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+    
     keys = pygame.key.get_pressed()
 
     # Jednorázový stisk mezerníku
@@ -321,6 +310,14 @@ while running:
     # pohyb hráče
     player.update(keys)
     counter.update(current_time)
+
+    if keys[pygame.K_SPACE] and not space_was_pressed_last_frame:
+        space_pressed = True
+
+    if not music_started:
+        akce_zvuk.play()
+        music_started = True
+
 
     # PODMÍNKY
     # POKUD je hráč u jídla na pultu a nic nenese TAK vezme jídlo
@@ -418,3 +415,4 @@ pygame.quit()
 
 # TO DO LIST: 
 # nelze chodit skrz stoly a jiné objekty - uz fakt nevim jak
+# hudba
